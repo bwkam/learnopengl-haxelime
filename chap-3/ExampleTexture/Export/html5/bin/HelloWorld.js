@@ -1003,7 +1003,7 @@ Main.prototype = $extend(lime_app_Application.prototype,{
 		gl.shaderSource(shader,source);
 		gl.compileShader(shader);
 		if(gl.getShaderParameter(shader,gl.COMPILE_STATUS) == 0) {
-			haxe_Log.trace(gl.getShaderInfoLog(shader),{ fileName : "Source/Main.hx", lineNumber : 43, className : "Main", methodName : "glCreateShader"});
+			haxe_Log.trace(gl.getShaderInfoLog(shader),{ fileName : "Source/Main.hx", lineNumber : 49, className : "Main", methodName : "glCreateShader"});
 			return null;
 		}
 		return shader;
@@ -1021,18 +1021,15 @@ Main.prototype = $extend(lime_app_Application.prototype,{
 		gl.deleteShader(fs);
 		gl.linkProgram(program);
 		if(gl.getProgramParameter(program,gl.LINK_STATUS) == 0) {
-			haxe_Log.trace(gl.getProgramInfoLog(program),{ fileName : "Source/Main.hx", lineNumber : 75, className : "Main", methodName : "glCreateProgram"});
-			haxe_Log.trace("VALIDATE_STATUS: " + Std.string(gl.getProgramParameter(program,gl.VALIDATE_STATUS)),{ fileName : "Source/Main.hx", lineNumber : 76, className : "Main", methodName : "glCreateProgram"});
-			haxe_Log.trace("ERROR: " + gl.getError(),{ fileName : "Source/Main.hx", lineNumber : 77, className : "Main", methodName : "glCreateProgram"});
+			haxe_Log.trace(gl.getProgramInfoLog(program),{ fileName : "Source/Main.hx", lineNumber : 81, className : "Main", methodName : "glCreateProgram"});
+			haxe_Log.trace("VALIDATE_STATUS: " + Std.string(gl.getProgramParameter(program,gl.VALIDATE_STATUS)),{ fileName : "Source/Main.hx", lineNumber : 82, className : "Main", methodName : "glCreateProgram"});
+			haxe_Log.trace("ERROR: " + gl.getError(),{ fileName : "Source/Main.hx", lineNumber : 83, className : "Main", methodName : "glCreateProgram"});
 			return null;
 		}
 		return program;
 	}
 	,initialize: function(gl) {
-		var vs = "#version 300 es\nlayout (location = 0) in vec3 aPos;\nvoid main()\n{\n\tgl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n}\n";
-		var fs = "#version 300 es\nprecision mediump float;\nout vec4 FragColor;\nuniform vec4 ourColor;\nvoid main() \n{\n    FragColor = ourColor;\n}\n";
-		this.program = this.glCreateProgram(gl,vs,fs);
-		var vertices = [-0.5,-0.5,0.0,0.5,-0.5,0.0,0.0,0.5,0.0];
+		var vertices = [0.5,0.5,0.0,1.0,0.0,0.0,1.0,1.0,0.5,-0.5,0.0,0.0,1.0,0.0,1.0,0.0,-0.5,-0.5,0.0,0.0,0.0,1.0,0.0,0.0,-0.5,0.5,0.0,1.0,1.0,0.0,0.0,1.0];
 		var elements = null;
 		var view = null;
 		var buffer = null;
@@ -1053,11 +1050,47 @@ Main.prototype = $extend(lime_app_Application.prototype,{
 		} else {
 			this1 = null;
 		}
-		var vertexData = this1;
+		var verticesData = this1;
+		var indices = [0,1,3,1,2,3];
+		var elements = null;
+		var view = null;
+		var buffer = null;
+		var len = null;
+		var this1;
+		if(elements != null) {
+			this1 = new Int32Array(elements);
+		} else if(indices != null) {
+			this1 = new Int32Array(indices);
+		} else if(view != null) {
+			this1 = new Int32Array(view);
+		} else if(buffer != null) {
+			if(len == null) {
+				this1 = new Int32Array(buffer,0);
+			} else {
+				this1 = new Int32Array(buffer,0,len);
+			}
+		} else {
+			this1 = null;
+		}
+		var indicesData = this1;
+		var vs = "#version 300 es\nlayout (location = 0) in vec3 aPos;\nlayout (location = 1) in vec3 aColor;\nlayout (location = 2) in vec2 aTexCoord; \nout vec3 ourColor;\nout vec2 TexCoord;\nvoid main()\n{\n\tgl_Position = vec4(aPos, 1.0);\n\tourColor = aColor;\n\tTexCoord = aTexCoord;\n}\n";
+		var fs = "#version 300 es\nprecision mediump float;\nout vec4 FragColor;\nin vec3 ourColor;\nin vec2 TexCoord;\nuniform sampler2D ourTexture;\nvoid main() \n{\n    FragColor = texture(ourTexture, TexCoord);\n}\n";
+		this.program = this.glCreateProgram(gl,vs,fs);
 		this.vbo = gl.createBuffer();
+		this.ebo = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER,this.vbo);
 		var target = gl.ARRAY_BUFFER;
-		var srcData = vertexData;
+		var srcData = verticesData;
+		var usage = gl.STATIC_DRAW;
+		var srcOffset = null;
+		if(srcOffset != null) {
+			gl.bufferData(target,srcData,usage,srcOffset,null);
+		} else {
+			gl.bufferData(target,srcData,usage);
+		}
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.ebo);
+		var target = gl.ELEMENT_ARRAY_BUFFER;
+		var srcData = indicesData;
 		var usage = gl.STATIC_DRAW;
 		var srcOffset = null;
 		if(srcOffset != null) {
@@ -1066,7 +1099,34 @@ Main.prototype = $extend(lime_app_Application.prototype,{
 			gl.bufferData(target,srcData,usage);
 		}
 		gl.bindBuffer(gl.ARRAY_BUFFER,null);
-		this.initialized = true;
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+		if(this.image == null && this.__preloader.complete) {
+			this.image = lime_utils_Assets.getImage("assets/container.jpg");
+			this.texture = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D,this.texture);
+			gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);
+			gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);
+			gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+			var target = gl.TEXTURE_2D;
+			var internalformat = gl.RGB;
+			var width = this.image.width;
+			var height = this.image.height;
+			var border = 0;
+			var format = gl.RGB;
+			var type = gl.UNSIGNED_BYTE;
+			var srcData = this.image.get_src();
+			var srcOffset = null;
+			if(srcOffset != null) {
+				gl.texImage2D(target,0,internalformat,width,height,border,format,type,srcData,srcOffset);
+			} else if(format != null) {
+				gl.texImage2D(target,0,internalformat,width,height,border,format,type,srcData);
+			} else {
+				gl.texImage2D(target,0,internalformat,width,height,border);
+			}
+			gl.generateMipmap(gl.TEXTURE_2D);
+			this.initialized = true;
+		}
 	}
 	,render: function(context) {
 		switch(context.type) {
@@ -1078,14 +1138,16 @@ Main.prototype = $extend(lime_app_Application.prototype,{
 			gl.clearColor(0.75,1,0,1);
 			gl.clear(gl.COLOR_BUFFER_BIT);
 			gl.useProgram(this.program);
-			var timeValue = new Date().getTime() / 1000;
-			var greenValue = Math.sin(timeValue) / 2.0 + 0.5;
-			var vertexColorLocation = gl.getUniformLocation(this.program,"ourColor");
-			gl.uniform4f(vertexColorLocation,0.0,greenValue,0.0,1.0);
 			gl.bindBuffer(gl.ARRAY_BUFFER,this.vbo);
-			gl.vertexAttribPointer(0,3,gl.FLOAT,false,12,0);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.ebo);
+			gl.vertexAttribPointer(0,3,gl.FLOAT,false,32,0);
 			gl.enableVertexAttribArray(0);
-			gl.drawArrays(gl.TRIANGLES,0,3);
+			gl.vertexAttribPointer(1,3,gl.FLOAT,false,32,12);
+			gl.enableVertexAttribArray(1);
+			gl.vertexAttribPointer(2,2,gl.FLOAT,false,32,24);
+			gl.enableVertexAttribArray(2);
+			gl.bindTexture(gl.TEXTURE_2D,this.texture);
+			gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_INT,0);
 			break;
 		default:
 		}
@@ -3726,7 +3788,6 @@ js_lib__$ArrayBuffer_ArrayBufferCompat.sliceImpl = function(begin,end) {
 	resultArray.set(u);
 	return resultArray.buffer;
 };
-Math.__name__ = "Math";
 var lime__$internal_backend_html5_GameDeviceData = function() {
 	this.connected = true;
 	this.buttons = [];
@@ -18067,7 +18128,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 703883;
+	this.version = 400735;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";

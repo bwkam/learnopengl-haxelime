@@ -24,7 +24,7 @@ import Main;
 
 		#if !munit
 		var app = new Main();
-		app.meta.set("build", "2");
+		app.meta.set("build", "4");
 		app.meta.set("company", "OpenFL");
 		app.meta.set("file", "HelloWorld");
 		app.meta.set("name", "Hello World");

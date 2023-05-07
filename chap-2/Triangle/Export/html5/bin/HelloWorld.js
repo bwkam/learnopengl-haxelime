@@ -889,7 +889,7 @@ ApplicationMain.main = function() {
 };
 ApplicationMain.create = function(config) {
 	var app = new Main();
-	app.meta.h["build"] = "2";
+	app.meta.h["build"] = "4";
 	app.meta.h["company"] = "OpenFL";
 	app.meta.h["file"] = "HelloWorld";
 	app.meta.h["name"] = "Hello World";
@@ -18062,7 +18062,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 805259;
+	this.version = 783050;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
