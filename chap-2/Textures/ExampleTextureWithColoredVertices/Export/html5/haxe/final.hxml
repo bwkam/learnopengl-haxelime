@@ -7,7 +7,6 @@
 -D lime-canvas
 -D howlerjs
 -D no-compilation
--D disable_preloader_assets=1
 -D lime-webgl
 -D lime-dom
 -D lime-howlerjs

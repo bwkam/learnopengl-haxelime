@@ -888,8 +888,9 @@ ApplicationMain.main = function() {
 	lime_system_System.__registerEntryPoint("HelloWorld",ApplicationMain.create);
 };
 ApplicationMain.create = function(config) {
+	ManifestResources.init(config);
 	var app = new Main();
-	app.meta.h["build"] = "4";
+	app.meta.h["build"] = "7";
 	app.meta.h["company"] = "OpenFL";
 	app.meta.h["file"] = "HelloWorld";
 	app.meta.h["name"] = "Hello World";
@@ -913,6 +914,20 @@ ApplicationMain.create = function(config) {
 		}
 	}
 	app.createWindow(attributes);
+	var _g = 0;
+	var _g1 = ManifestResources.preloadLibraries;
+	while(_g < _g1.length) {
+		var library = _g1[_g];
+		++_g;
+		app.__preloader.addLibrary(library);
+	}
+	var _g = 0;
+	var _g1 = ManifestResources.preloadLibraryNames;
+	while(_g < _g1.length) {
+		var name = _g1[_g];
+		++_g;
+		app.__preloader.addLibraryName(name);
+	}
 	app.__preloader.load();
 	ApplicationMain.start(app);
 };
@@ -1074,7 +1089,7 @@ Main.prototype = $extend(lime_app_Application.prototype,{
 		}
 		var indicesData = this1;
 		var vs = "#version 300 es\nlayout (location = 0) in vec3 aPos;\nlayout (location = 1) in vec3 aColor;\nlayout (location = 2) in vec2 aTexCoord; \nout vec3 ourColor;\nout vec2 TexCoord;\nvoid main()\n{\n\tgl_Position = vec4(aPos, 1.0);\n\tourColor = aColor;\n\tTexCoord = aTexCoord;\n}\n";
-		var fs = "#version 300 es\nprecision mediump float;\nout vec4 FragColor;\nin vec3 ourColor;\nin vec2 TexCoord;\nuniform sampler2D ourTexture;\nvoid main() \n{\n    FragColor = texture(ourTexture, TexCoord);\n}\n";
+		var fs = "#version 300 es\nprecision mediump float;\nout vec4 FragColor;\nin vec3 ourColor;\nin vec2 TexCoord;\nuniform sampler2D ourTexture;\nvoid main() \n{\n    FragColor = texture(ourTexture, TexCoord) * vec4(ourColor, 1.0);\n}\n";
 		this.program = this.glCreateProgram(gl,vs,fs);
 		this.vbo = gl.createBuffer();
 		this.ebo = gl.createBuffer();
@@ -1154,6 +1169,34 @@ Main.prototype = $extend(lime_app_Application.prototype,{
 	}
 	,__class__: Main
 });
+var ManifestResources = function() { };
+$hxClasses["ManifestResources"] = ManifestResources;
+ManifestResources.__name__ = "ManifestResources";
+ManifestResources.init = function(config) {
+	ManifestResources.preloadLibraries = [];
+	ManifestResources.preloadLibraryNames = [];
+	ManifestResources.rootPath = null;
+	if(config != null && Object.prototype.hasOwnProperty.call(config,"rootPath")) {
+		ManifestResources.rootPath = Reflect.field(config,"rootPath");
+		if(!StringTools.endsWith(ManifestResources.rootPath,"/")) {
+			ManifestResources.rootPath += "/";
+		}
+	}
+	if(ManifestResources.rootPath == null) {
+		ManifestResources.rootPath = "./";
+	}
+	var bundle;
+	var data = "{\"name\":null,\"assets\":\"aoy4:pathy24:assets%2Fawesomeface.pngy4:sizei59277y4:typey5:IMAGEy2:idR1y7:preloadtgoR0y22:assets%2Fcontainer.jpgR2i184939R3R4R5R7R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
+	var manifest = lime_utils_AssetManifest.parse(data,ManifestResources.rootPath);
+	var library = lime_utils_AssetLibrary.fromManifest(manifest);
+	lime_utils_Assets.registerLibrary("default",library);
+	library = lime_utils_Assets.getLibrary("default");
+	if(library != null) {
+		ManifestResources.preloadLibraries.push(library);
+	} else {
+		ManifestResources.preloadLibraryNames.push("default");
+	}
+};
 Math.__name__ = "Math";
 var Reflect = function() { };
 $hxClasses["Reflect"] = Reflect;
@@ -18128,7 +18171,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 400735;
+	this.version = 769056;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
@@ -20175,8 +20218,58 @@ lime_utils_Preloader.prototype = {
 	,update: function(loaded,total) {
 	}
 	,updateProgress: function() {
+		var _gthis = this;
 		if(!this.simulateProgress) {
 			this.onProgress.dispatch(this.bytesLoaded,this.bytesTotal);
+		}
+		if(this.loadedLibraries == this.libraries.length && !this.initLibraryNames) {
+			this.initLibraryNames = true;
+			var _g = 0;
+			var _g1 = this.libraryNames;
+			while(_g < _g1.length) {
+				var name = [_g1[_g]];
+				++_g;
+				lime_utils_Log.verbose("Preloading asset library: " + name[0],{ fileName : "lime/utils/Preloader.hx", lineNumber : 239, className : "lime.utils.Preloader", methodName : "updateProgress"});
+				lime_utils_Assets.loadLibrary(name[0]).onProgress((function(name) {
+					return function(loaded,total) {
+						if(total > 0) {
+							if(!Object.prototype.hasOwnProperty.call(_gthis.bytesTotalCache.h,name[0])) {
+								_gthis.bytesTotalCache.h[name[0]] = total;
+								_gthis.bytesTotal += total - 200;
+							}
+							if(loaded > total) {
+								loaded = total;
+							}
+							if(!Object.prototype.hasOwnProperty.call(_gthis.bytesLoadedCache2.h,name[0])) {
+								_gthis.bytesLoaded += loaded;
+							} else {
+								_gthis.bytesLoaded += loaded - _gthis.bytesLoadedCache2.h[name[0]];
+							}
+							_gthis.bytesLoadedCache2.h[name[0]] = loaded;
+							if(!_gthis.simulateProgress) {
+								_gthis.onProgress.dispatch(_gthis.bytesLoaded,_gthis.bytesTotal);
+							}
+						}
+					};
+				})(name)).onComplete((function(name) {
+					return function(library) {
+						var total = 200;
+						if(Object.prototype.hasOwnProperty.call(_gthis.bytesTotalCache.h,name[0])) {
+							total = _gthis.bytesTotalCache.h[name[0]];
+						}
+						if(!Object.prototype.hasOwnProperty.call(_gthis.bytesLoadedCache2.h,name[0])) {
+							_gthis.bytesLoaded += total;
+						} else {
+							_gthis.bytesLoaded += total - _gthis.bytesLoadedCache2.h[name[0]];
+						}
+						_gthis.loadedAssetLibrary(name[0]);
+					};
+				})(name)).onError((function() {
+					return function(e) {
+						lime_utils_Log.error(e,{ fileName : "lime/utils/Preloader.hx", lineNumber : 293, className : "lime.utils.Preloader", methodName : "updateProgress"});
+					};
+				})());
+			}
 		}
 		if(!this.simulateProgress && this.loadedLibraries == this.libraries.length + this.libraryNames.length) {
 			if(!this.preloadComplete) {
