@@ -14,6 +14,7 @@ I once stumbled across an astonishing resource for learning OpenGL, but the prob
   - [Textures](https://github.com/bwkam/learnopengl-haxelime/tree/main/Getting-Started/Textures)
   - [Transformations](https://github.com/bwkam/learnopengl-haxelime/tree/main/Getting-Started/Transformations)
   - [Coordinate Systems](https://github.com/bwkam/learnopengl-haxelime/tree/main/Getting-Started/Coordinate-Systems)
+  - [Camera](https://github.com/bwkam/learnopengl-haxelime/tree/main/Getting-Started/Camera)
 
 ## Special Thanks
   - [47rooks](https://github.com/47rooks) for helping and providing structure for the code used throughout all of the demos.
