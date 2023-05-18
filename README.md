@@ -18,4 +18,4 @@ I once stumbled across an astonishing resource for learning OpenGL, but the prob
 
 ## Special Thanks
   - [47rooks](https://github.com/47rooks) for helping and providing structure for the code used throughout all of the demos.
-  - The folks at the [#lime channel](https://discord.com/channels/162395145352904705/769686258049351722) ❤️.
+  - The folks at the #lime channel.
