@@ -17,6 +17,7 @@ I once stumbled across an astonishing resource for learning OpenGL, but the prob
   - [Camera](https://github.com/bwkam/learnopengl-haxelime/tree/main/Getting-Started/Camera)
 - [Lightning](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning)
   - [Colors](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning/Colors)
+  - [Basic Lightning](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning/PhongCube)
 
 ## Special Thanks
   - [47rooks](https://github.com/47rooks) for helping and providing structure for the code used throughout all of the demos.
