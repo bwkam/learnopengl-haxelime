@@ -42,11 +42,11 @@ class Main extends Application {
 	var currentFrame:Float;
 	var lastFrame:Float;
 
-    // Key press state flags
-    var moveLeft:Bool = false;
-    var moveRight:Bool = false;
-    var moveForward:Bool = false;
-    var moveBackward:Bool = false;
+	// Key press state flags
+	var moveLeft:Bool = false;
+	var moveRight:Bool = false;
+	var moveForward:Bool = false;
+	var moveBackward:Bool = false;
 
 	// Make sure you only do initialization once
 	var initialized:Bool;
@@ -163,10 +163,8 @@ class Main extends Application {
 		var verticesData = new Float32Array(vertices);
 
 		cubePositions = [
-			[0.0, 0.0, -10.0],
-             [2.0, 5.0, -15.0], [-1.5, -2.2, -2.5], [-3.8, -2.0, -12.3],
-            [2.4, -0.4, -3.5], [-1.7, 3.0, -7.5], [1.3, -2.0, -2.5], [1.5, 2.0, -2.5],
-			[1.5, 0.2, -1.5], [-1.3, 1.0, -1.5]];
+			[0.0, 0.0, -10.0], [2.0, 5.0, -15.0], [-1.5, -2.2, -2.5], [-3.8, -2.0, -12.3], [2.4, -0.4, -3.5], [-1.7, 3.0, -7.5], [1.3, -2.0, -2.5],
+			[1.5, 2.0, -2.5], [1.5, 0.2, -1.5], [-1.3, 1.0, -1.5]];
 
 		gl.enable(gl.DEPTH_TEST);
 
@@ -284,123 +282,124 @@ void main()
 			mat[14] = -2 * zFar * zNear / (zFar - zNear);
 		}
 	}
-        
-    /**
-     * createLookAtMatrix is an alternative to Matrix4.pointAt(). I could not
-     * figure out how to pass the correct parameters to pointAt() whereas this function
-     * works with what you already have.
-     * 
-     * @param cameraPos 
-     * @param target 
-     * @param up 
-     * @return Matrix4
-     */
-    function createLookAtMatrix(cameraPos:Vector4, target:Vector4, up:Vector4):Matrix4
-        {
-            var cameraDir = cameraPos.subtract(target);
-            cameraDir.normalize();
-            var cameraRight = up.crossProduct(cameraDir);
-            cameraRight.normalize();
-            var cameraUp = cameraDir.crossProduct(cameraRight);
-	    cameraUp.normalize();
-            var cameraMat = new Matrix4();
-        
-            cameraMat[0] = cameraRight.x;
-            cameraMat[1] = cameraUp.x;
-            cameraMat[2] = cameraDir.x;
-            cameraMat[3] = 0.0;
-            cameraMat[4] = cameraRight.y;
-            cameraMat[5] = cameraUp.y;
-            cameraMat[6] = cameraDir.y;
-            cameraMat[7] = 0.0;
-            cameraMat[8] = cameraRight.z;
-            cameraMat[9] = cameraUp.z;
-            cameraMat[10] = cameraDir.z;
-            cameraMat[11] = 0.0;
-            cameraMat[12] = -cameraPos.x;
-            cameraMat[13] = -cameraPos.y;
-            cameraMat[14] = -cameraPos.z;
-            cameraMat[15] = 1.0;
-            
-            return cameraMat;
-        }
-        
+
+	/**
+	 * createLookAtMatrix is an alternative to Matrix4.pointAt(). I could not
+	 * figure out how to pass the correct parameters to pointAt() whereas this function
+	 * works with what you already have.
+	 * 
+	 * @param cameraPos 
+	 * @param target 
+	 * @param up 
+	 * @return Matrix4
+	 */
+	function createLookAtMatrix(cameraPos:Vector4, target:Vector4, up:Vector4):Matrix4 {
+		var cameraDir = cameraPos.subtract(target);
+		cameraDir.normalize();
+		var cameraRight = up.crossProduct(cameraDir);
+		cameraRight.normalize();
+		var cameraUp = cameraDir.crossProduct(cameraRight);
+		cameraUp.normalize();
+		var cameraMat = new Matrix4();
+
+		cameraMat[0] = cameraRight.x;
+		cameraMat[1] = cameraUp.x;
+		cameraMat[2] = cameraDir.x;
+		cameraMat[3] = 0.0;
+		cameraMat[4] = cameraRight.y;
+		cameraMat[5] = cameraUp.y;
+		cameraMat[6] = cameraDir.y;
+		cameraMat[7] = 0.0;
+		cameraMat[8] = cameraRight.z;
+		cameraMat[9] = cameraUp.z;
+		cameraMat[10] = cameraDir.z;
+		cameraMat[11] = 0.0;
+		cameraMat[12] = -cameraPos.x;
+		cameraMat[13] = -cameraPos.y;
+		cameraMat[14] = -cameraPos.z;
+		cameraMat[15] = 1.0;
+
+		return cameraMat;
+	}
+
 	function moveCamera():Void {
 		var camSpeed = 10 * deltaTime;
 		if (moveForward) {
-            var tgt = cameraFront.clone();
-            tgt.normalize();
-            tgt.scaleBy(camSpeed);
-            cameraPos = cameraPos.add(tgt);
-        }
-        if (moveBackward) {
-            var tgt = cameraFront.clone();
-            tgt.normalize();
-            tgt.scaleBy(camSpeed);
-            cameraPos = cameraPos.subtract(tgt);
-        }
+			var tgt = cameraFront.clone();
+			tgt.normalize();
+			tgt.scaleBy(camSpeed);
+			cameraPos = cameraPos.add(tgt);
+		}
+		if (moveBackward) {
+			var tgt = cameraFront.clone();
+			tgt.normalize();
+			tgt.scaleBy(camSpeed);
+			cameraPos = cameraPos.subtract(tgt);
+		}
 		if (moveLeft) {
-            var m = cameraFront.crossProduct(cameraUp);
-            m.normalize();
-            m.scaleBy(camSpeed);
-            cameraPos = cameraPos.subtract(m);
-        }
+			var m = cameraFront.crossProduct(cameraUp);
+			m.normalize();
+			m.scaleBy(camSpeed);
+			cameraPos = cameraPos.subtract(m);
+		}
 		if (moveRight) {
-            var m = cameraFront.crossProduct(cameraUp);
-            m.normalize();
-            m.scaleBy(camSpeed);
-            cameraPos = cameraPos.add(m);
+			var m = cameraFront.crossProduct(cameraUp);
+			m.normalize();
+			m.scaleBy(camSpeed);
+			cameraPos = cameraPos.add(m);
 		}
 	}
 
-    public override function update (deltaTime:Int):Void {
-        this.deltaTime = deltaTime * 1.0 / 1000.0;
-        if (moveLeft || moveRight || moveForward || moveBackward) {
-            moveCamera();
-        }
-    }
+	public override function update(deltaTime:Int):Void {
+		this.deltaTime = deltaTime * 1.0 / 1000.0;
+		if (moveLeft || moveRight || moveForward || moveBackward) {
+			moveCamera();
+		}
+	}
 
 	/**
 	 * onKeyDown converts the key press to a state because the event is only sent on the press.
-     * If you hold it down there won't be more events, so you need to create a state flag
-     * to cope with long holds. The onKeyUp() method resets the flag.
-     * 
-     * FYI - I cut and pasted this from the lime sample and it used the arrow keys so you'll
-     *       need to update this if you want WASD.
-     * 
+	 * If you hold it down there won't be more events, so you need to create a state flag
+	 * to cope with long holds. The onKeyUp() method resets the flag.
+	 * 
+	 * FYI - I cut and pasted this from the lime sample and it used the arrow keys so you'll
+	 *       need to update this if you want WASD.
+	 * 
 	 * @param key 
 	 * @param modifier 
 	 */
-	public override function onKeyDown (key:KeyCode, modifier:KeyModifier):Void {
-		
+	public override function onKeyDown(key:KeyCode, modifier:KeyModifier):Void {
 		switch (key) {
-			
-			case LEFT: moveLeft = true;
-			case RIGHT: moveRight = true;
-			case UP: moveForward = true;
-			case DOWN: moveBackward = true;
+			case LEFT:
+				moveLeft = true;
+			case RIGHT:
+				moveRight = true;
+			case UP:
+				moveForward = true;
+			case DOWN:
+				moveBackward = true;
 			default:
-			
 		}
-		
 	}
-    public override function onKeyUp(key:KeyCode, modifier:KeyModifier):Void {
-		
+
+	public override function onKeyUp(key:KeyCode, modifier:KeyModifier):Void {
 		switch (key) {
-			
-			case LEFT: moveLeft = false;
-			case RIGHT: moveRight = false;
-			case UP: moveForward = false;
-			case DOWN: moveBackward = false;
+			case LEFT:
+				moveLeft = false;
+			case RIGHT:
+				moveRight = false;
+			case UP:
+				moveForward = false;
+			case DOWN:
+				moveBackward = false;
 			default:
-			
-		};	
+		};
 	}
 
 	public override function render(context:RenderContext):Void {
 		switch (context.type) {
 			case OPENGL, OPENGLES, WEBGL:
-				var gl:WebGL2RenderContext = context.webgl;
+				var gl:WebGL2RenderContext = context.webgl2;
 
 				if (!initialized) {
 					initialize(gl);
@@ -434,10 +433,10 @@ void main()
 
 				view = new Matrix4();
 				view.identity();
-                // I replaced this with my own lookat function. I think Lime's is ok but I could not figured out
-                // what parameters to pass it.
-                // view.pointAt(new Vector4(0.0, 0.0, 0.0), cameraPos.add(cameraFront), new Vector4(0.0, 1.0, 0.0));
-                view = createLookAtMatrix(cameraPos, cameraPos.add(cameraFront), new Vector4(0.0, 1.0, 0.0));
+				// I replaced this with my own lookat function. I think Lime's is ok but I could not figured out
+				// what parameters to pass it.
+				// view.pointAt(new Vector4(0.0, 0.0, 0.0), cameraPos.add(cameraFront), new Vector4(0.0, 1.0, 0.0));
+				view = createLookAtMatrix(cameraPos, cameraPos.add(cameraFront), new Vector4(0.0, 1.0, 0.0));
 
 				gl.uniformMatrix4fv(gl.getUniformLocation(program, "view"), false, view);
 				gl.uniformMatrix4fv(gl.getUniformLocation(program, "proj"), false, proj);

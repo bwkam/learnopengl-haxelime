@@ -414,11 +414,6 @@ void main()
 		};
 	}
 
-	// public override function onMouseDown(x:Float, y:Float, button:MouseButton) {
-	// 	var limeElement:DOMElement = js.Browser.document.getElementById("content");
-	// 	limeElement.requestPointerLock();
-	// }
-
 	public override function onMouseMove(x:Float, y:Float) {
 		trace("hi");
 
@@ -522,4 +517,3 @@ void main()
 		}
 	}
 }
-

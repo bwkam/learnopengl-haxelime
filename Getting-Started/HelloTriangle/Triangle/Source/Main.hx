@@ -132,7 +132,7 @@ void main()
 			
 			case OPENGL, OPENGLES, WEBGL:
 				
-				var gl:WebGL2RenderContext = context.webgl;
+				var gl:WebGL2RenderContext = context.webgl2;
 
 				if (!initialized) {
 					initialize(gl);
