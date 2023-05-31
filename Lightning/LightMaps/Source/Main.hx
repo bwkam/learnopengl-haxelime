@@ -173,6 +173,8 @@ class Main extends Application {
 
 	public override function onKeyDown(key:KeyCode, modifier:KeyModifier):Void {
 		switch (key) {
+			case ESCAPE:
+				window.close();
 			case LEFT | A:
 				Camera.moveLeft = true;
 			case RIGHT | D:
