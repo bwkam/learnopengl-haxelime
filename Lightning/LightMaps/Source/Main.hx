@@ -16,6 +16,13 @@ import lime.math.Matrix4;
 import lime.ui.KeyCode;
 import lime.ui.KeyModifier;
 import lime.utils.Float32Array;
+import peote.ui.PeoteUIDisplay;
+import peote.view.PeoteView;
+import peote.view.Color;
+import peote.ui.interactive.UISlider;
+import peote.ui.style.*;
+import peote.ui.config.*;
+import peote.ui.event.*;
 
 using Lambda;
 
@@ -40,6 +47,9 @@ class Main extends Application {
 
 	var gl:WebGLRenderContext;
 	var initialized:Bool = false;
+
+	var peoteView:PeoteView;
+	var uiDisplay:PeoteUIDisplay;
 
 	// just for neovim
 	static function main() {}
@@ -156,7 +166,93 @@ class Main extends Application {
 
 		gl.generateMipmap(gl.TEXTURE_2D);
 
+		peoteView = new PeoteView(window, false);
+		var transparent = 0x00000000;
+		uiDisplay = new PeoteUIDisplay(10, 10, window.width - 20, window.height - 20, transparent);
+		peoteView.addDisplay(uiDisplay);
+
+		var roundBorderStyle:RoundBorderStyle = {
+			color: Color.GREY2,
+			borderColor: Color.GREY4,
+			borderSize: 3.0,
+			borderRadius: 20.0
+		}
+
+		var sliderConfig:SliderConfig = {
+			backgroundStyle: roundBorderStyle,
+			draggerStyle: roundBorderStyle.copy(Color.YELLOW),
+
+			// vertical:true,
+			// reverse:true,
+
+			// draggerSpace:{left:15, right:15},
+			// backgroundSpace:{left:50},
+
+			// backgroundLengthPercent:0.9,
+			backgroundSizePercent: 0.3,
+
+			draggerLength: 50,
+			draggerLengthPercent: 0.1,
+
+			draggerSize: 20,
+			draggerSizePercent: 0.75,
+
+			// draggerOffset:0,
+			draggerOffsetPercent: 0.5,
+
+			draggSpaceStart: 40,
+			draggSpaceEnd: 20,
+		};
+
+		var hSlider = new UISlider(80, 10, 500, 40, sliderConfig);
+		hSlider.valueStart = -5;
+		hSlider.valueEnd = 10;
+		setSliderEvents(hSlider);
+		uiDisplay.add(hSlider);
+
+		hSlider.onChange = function(uiSlider:UISlider, value:Float, percent:Float) {
+			trace('hSlider value:$value, percent:$percent');
+		}
+
 		initialized = true;
+	}
+
+	function setSliderEvents(slider:UISlider) {
+		slider.onPointerOver = function(uiSlider:UISlider, e:PointerEvent) {
+			uiSlider.backgroundStyle.color = Color.GREEN;
+			uiSlider.updateBackgroundStyle();
+		}
+
+		slider.onPointerOut = function(uiSlider:UISlider, e:PointerEvent) {
+			uiSlider.backgroundStyle.color = Color.GREY2;
+			uiSlider.updateBackgroundStyle();
+		}
+
+		slider.onDraggerPointerOver = function(uiSlider:UISlider, e:PointerEvent) {
+			uiSlider.draggerStyle.color = Color.RED;
+			uiSlider.updateDraggerStyle();
+		}
+
+		slider.onDraggerPointerOut = function(uiSlider:UISlider, e:PointerEvent) {
+			uiSlider.draggerStyle.color = Color.YELLOW;
+			uiSlider.updateDraggerStyle();
+		}
+
+		slider.onDraggerPointerDown = function(uiSlider:UISlider, e:PointerEvent) {
+			uiSlider.draggerStyle.borderColor = Color.YELLOW;
+			uiSlider.updateDraggerStyle();
+		}
+
+		slider.onDraggerPointerUp = function(uiSlider:UISlider, e:PointerEvent) {
+			uiSlider.draggerStyle.borderColor = Color.GREY4;
+			uiSlider.updateDraggerStyle();
+		}
+
+		slider.onMouseWheel = function(uiSlider:UISlider, e:WheelEvent) {
+			// uiSlider.value += e.deltaY * 0.1;
+			// uiSlider.setValue (uiSlider.value - e.deltaY * 0.05);
+			uiSlider.setWheelDelta(e.deltaY);
+		}
 	}
 
 	public override function update(deltaTime:Int):Void {
@@ -275,5 +371,9 @@ class Main extends Application {
 			cameraPosition: Camera.pos,
 			vertexBufferData: verticesData,
 		});
+
+		// render ui
+		peoteView.renderPart();
+
 	}
 }

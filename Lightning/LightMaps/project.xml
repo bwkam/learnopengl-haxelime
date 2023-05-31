@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-	
+
 	<meta title="Hello World" package="org.openfl.lime.samples.helloworld" version="1.0.0" company="OpenFL" />
 	<app main="Main" path="Export" file="HelloWorld" />
-	
+
 	<source path="Source" />
-	
+
 	<haxelib name="lime" />
-	
+	<haxelib name="peote-view" />
+	<haxelib name="peote-ui" />
+	<haxelib name="input2action" />
+
+	<!-- 
+		needed full dce to prevent error
+		JIT ERROR 0 (jit.c line 541) 
+	-->
+	<haxeflag name="-dce" value="full" />
+
+	<haxedef name="no_deprecation_warnings" />
+
 	<assets path="Assets" rename="assets" />
-	
+
 </project>
