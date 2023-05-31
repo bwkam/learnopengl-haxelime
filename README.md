@@ -19,7 +19,7 @@ I once stumbled across an astonishing resource for learning OpenGL, but the prob
   - [Colors](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning/Colors)
   - [Basic Lightning](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning/PhongCube)
   - [Materials](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning/Materials)
-  - [LightMaps](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning/LightMaps)
+  - [Light Maps](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning/LightMaps)
 
 ## Special Thanks
   - [47rooks](https://github.com/47rooks) for helping and providing structure for the code used throughout all of the demos.
