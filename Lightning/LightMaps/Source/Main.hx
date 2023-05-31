@@ -73,7 +73,8 @@ class Main extends Application {
 
 		Camera.init();
 
-		Application.current.window.mouseLock = true;
+		// todo - add this back
+		// Application.current.window.mouseLock = true;
 
 		cube = new SimpleCubeProgram(gl);
 		lightCube = new LightProgram(gl);
@@ -213,7 +214,8 @@ class Main extends Application {
 		hSlider.onChange = function(uiSlider:UISlider, value:Float, percent:Float) {
 			trace('hSlider value:$value, percent:$percent');
 		}
-
+		
+		PeoteUIDisplay.registerEvents(window);			
 		initialized = true;
 	}
 
