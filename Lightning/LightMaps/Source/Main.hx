@@ -309,8 +309,14 @@ class Main extends Application {
 			return;
 		}
 
+		// ---- PEOTE-VIEW and -UI ----
+		gl.viewport(0, 0, window.width, window.height);
+		gl.scissor(0, 0, window.width, window.height);
+		gl.enable(gl.SCISSOR_TEST);    
+		// ----------------------------
+
 		// clear the screen
-		gl.clearColor(0.0, 0.0, 0.0, 1);
+		gl.clearColor(0.0, 0.0, 0.0, 0.0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 		cube.use();
