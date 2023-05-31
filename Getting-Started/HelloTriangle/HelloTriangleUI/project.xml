@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<meta title="Hello World" package="org.openfl.lime.samples.helloworld" version="1.0.0" company="OpenFL" />
+	<app main="Main" path="Export" file="HelloWorld" />
+	
+	
+	<window width="800" height="600" fps="61" />
+	<window width="0" height="0" fps="61" if="html5||android" />
+	<window if="html5" allowHighDPI="false" />
+
+	
+	<source path="Source" />
+	
+
+	
+	<haxelib name="lime" />
+	
+	<haxelib name="peote-view" />
+
+	<haxelib name="peote-text" />
+	<haxelib name="json2object" />
+	
+	<haxelib name="peote-ui" />
+	<haxelib name="input2action" />
+
+		
+		
+	<!--<assets path="Assets" rename="assets" />-->
+
+	
+	
+	<haxedef name="peoteui_debug_macro" />
+	<haxedef name="peotetext_debug_macro" />
+	
+	<!-- force compiling for a special opengl-es version (only set one of them) -->
+	<!-- this optimizes the build and forces no-runtimecheck for the gl-features -->
+	<!-- <haxedef name="peoteview_es3" if="html5" /> -->
+	<haxedef name="peoteview_es2" if="android" /> <!-- android autodetect es3 but did not work, so force to es2 -->
+	
+	<!-- use special gl-features for optimization (if supported by opengl-es version) -->
+	<haxedef name="peoteview_uniformbuffers" />
+	<haxedef name="peoteview_instancedrawing" />
+	<haxedef name="peoteview_vertexarrayobjects" />
+
+	<!--<haxedef name="peoteview_debug_macro" />-->
+	<!--<haxedef name="peoteview_debug_buffer" />-->
+	<!--<haxedef name="peoteview_debug_view" />-->
+	<!--<haxedef name="peoteview_debug_display" />
+	<!--<haxedef name="peoteview_debug_program" />-->
+	<!--<haxedef name="peoteview_debug_texture" />-->
+	<haxedef name="peoteview_debug_shader" />
+	
+	<!-- <haxedef name="webgl-debug" /> --> <!-- try with chrome and look here: https://www.khronos.org/webgl/wiki/Debugging -->
+	<!-- <haxedef name="source-map-content" /> --> <!-- to debug with chrome id needs also "-debug" -->
+	<haxeflag name="-dce" value="full" />
+	<!-- <haxedef name="dump=pretty output" /> -->
+	<haxedef name="keep_inline_positions" />
+		
+	<haxedef name="no-deprecation-warnings" />
+	
+</project>
