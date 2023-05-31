@@ -38,16 +38,23 @@ class Main extends Application {
 	var texture:GLTexture;
 	var texture2:GLTexture;
 
-	// Make sure you only do initialization once
-	var initialized:Bool;
+	var gl:WebGLRenderContext;
+	var initialized:Bool = false;
 
 	// just for neovim
 	static function main() {}
 
-	public function new() {
-		super();
+	override function onPreloadComplete() {
+		// if we call init from here then all assets are loaded
+		// so you you don't need to check for preloader.complete etc
 
-		initialized = false;
+		switch (window.context.type) {
+			case OPENGL, OPENGLES, WEBGL:
+				gl = window.context.webgl;
+				initialize(gl);
+			default:
+				trace('needs gl');
+		}
 	}
 
 	function initialize(gl:WebGLRenderContext):Void {
@@ -117,46 +124,47 @@ class Main extends Application {
 		gl.bufferData(gl.ARRAY_BUFFER, verticesData, gl.STATIC_DRAW);
 		gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-		if (image == null && preloader.complete) {
-			image = Assets.getImage("assets/container2.png");
+		image = Assets.getImage("assets/container2.png");
 
-			// create the texture
-			texture = gl.createTexture();
-			gl.bindTexture(gl.TEXTURE_2D, texture);
+		// create the texture
+		texture = gl.createTexture();
+		gl.bindTexture(gl.TEXTURE_2D, texture);
 
-			// config mimap and other options
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+		// config mimap and other options
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
 
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, image.width, image.height, 0, gl.RGB, gl.UNSIGNED_BYTE, image.src);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, image.width, image.height, 0, gl.RGB, gl.UNSIGNED_BYTE, image.src);
 
-			gl.generateMipmap(gl.TEXTURE_2D);
-		}
+		gl.generateMipmap(gl.TEXTURE_2D);
 
-		if (image2 == null && preloader.complete) {
-			image2 = Assets.getImage("assets/specular.png");
+		image2 = Assets.getImage("assets/specular.png");
 
-			// create the texture
-			texture2 = gl.createTexture();
-			gl.bindTexture(gl.TEXTURE_2D, texture2);
+		// create the texture
+		texture2 = gl.createTexture();
+		gl.bindTexture(gl.TEXTURE_2D, texture2);
 
-			// config mimap and other options
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+		// config mimap and other options
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
 
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, image.width, image.height, 0, gl.RGB, gl.UNSIGNED_BYTE, image.src);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, image.width, image.height, 0, gl.RGB, gl.UNSIGNED_BYTE, image.src);
 
-			gl.generateMipmap(gl.TEXTURE_2D);
+		gl.generateMipmap(gl.TEXTURE_2D);
 
-			initialized = true;
-		}
+		initialized = true;
 	}
 
 	public override function update(deltaTime:Int):Void {
+		// don't call update unless ready
+		if (!initialized) {
+			return;
+		}
+
 		this.deltaTime = deltaTime * 1.0 / 1000.0;
 		if (Camera.moveLeft || Camera.moveRight || Camera.moveForward || Camera.moveBackward) {
 			Camera.moveCamera(this.deltaTime);
@@ -196,81 +204,74 @@ class Main extends Application {
 	}
 
 	public override function render(context:RenderContext):Void {
-		switch (context.type) {
-			case OPENGL, OPENGLES, WEBGL:
-				var gl:WebGLRenderContext = context.webgl;
-
-				if (!initialized) {
-					initialize(gl);
-				}
-
-				// clear the screen
-				gl.clearColor(0.0, 0.0, 0.0, 1);
-				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-				cube.use();
-
-				model = new Matrix4();
-				model.identity();
-				model.appendTranslation(1.0, 1.0, 1.0);
-				model.appendScale(4.0, 4.0, 4.0);
-
-				view = new Matrix4();
-				view.identity();
-				view = MatrixUtils.createLookAtMatrix(Camera.pos, Camera.pos.add(Camera.front), new Vector4(0.0, 1.0, 0.0));
-
-				proj = new Matrix4();
-				proj.identity();
-				MatrixUtils.createPerspective(proj, Camera.fov * Math.PI / 180, Application.current.window.width / Application.current.window.height, 0.1,
-					100.0);
-
-				var lightX = Math.sin(Timer.stamp()) * 2.0;
-				var lightZ = Math.cos(Timer.stamp()) * 1.5;
-
-				var lightPos = [lightX, 10.0, lightZ];
-
-				// the cube
-				cube.render({
-					vbo: vbo,
-					modelMatrix: model,
-					viewMatrix: view,
-					projectionMatrix: proj,
-					cameraPosition: Camera.pos,
-					vertexBufferData: verticesData,
-					objectColor: [1.0, 0.5, 0.31],
-					lightColor: [1.0, 1.0, 1.0],
-					lightPos: [for (i in lightPos) i],
-					viewPos: MatrixUtils.vecToArray(Camera.pos),
-					material: {
-						specular: [0.5, 0.5, 0.5],
-						shininess: 64.0
-					},
-					light: {
-						ambient: [0.2, 0.2, 0.2],
-						diffuse: [0.5, 0.5, 0.5],
-						specular: [1.0, 1.0, 1.0]
-					},
-					diffuseMap: texture,
-				});
-
-				model = new Matrix4();
-				model.identity();
-				model.appendTranslation(lightPos[0], lightPos[1], lightPos[2]);
-				model.appendScale(0.6, 0.6, 0.6);
-
-				lightCube.use();
-
-				// light cube
-				lightCube.render({
-					vbo: vbo,
-					modelMatrix: model,
-					viewMatrix: view,
-					projectionMatrix: proj,
-					cameraPosition: Camera.pos,
-					vertexBufferData: verticesData,
-				});
-
-			default:
+		// don't do render unless ready
+		if (!initialized) {
+			return;
 		}
+
+		// clear the screen
+		gl.clearColor(0.0, 0.0, 0.0, 1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+		cube.use();
+
+		model = new Matrix4();
+		model.identity();
+		model.appendTranslation(1.0, 1.0, 1.0);
+		model.appendScale(4.0, 4.0, 4.0);
+
+		view = new Matrix4();
+		view.identity();
+		view = MatrixUtils.createLookAtMatrix(Camera.pos, Camera.pos.add(Camera.front), new Vector4(0.0, 1.0, 0.0));
+
+		proj = new Matrix4();
+		proj.identity();
+		MatrixUtils.createPerspective(proj, Camera.fov * Math.PI / 180, Application.current.window.width / Application.current.window.height, 0.1, 100.0);
+
+		var lightX = Math.sin(Timer.stamp()) * 2.0;
+		var lightZ = Math.cos(Timer.stamp()) * 1.5;
+
+		var lightPos = [lightX, 10.0, lightZ];
+
+		// the cube
+		cube.render({
+			vbo: vbo,
+			modelMatrix: model,
+			viewMatrix: view,
+			projectionMatrix: proj,
+			cameraPosition: Camera.pos,
+			vertexBufferData: verticesData,
+			objectColor: [1.0, 0.5, 0.31],
+			lightColor: [1.0, 1.0, 1.0],
+			lightPos: [for (i in lightPos) i],
+			viewPos: MatrixUtils.vecToArray(Camera.pos),
+			material: {
+				specular: [0.5, 0.5, 0.5],
+				shininess: 64.0
+			},
+			light: {
+				ambient: [0.2, 0.2, 0.2],
+				diffuse: [0.5, 0.5, 0.5],
+				specular: [1.0, 1.0, 1.0]
+			},
+			diffuseMap: texture,
+		});
+
+		model = new Matrix4();
+		model.identity();
+		model.appendTranslation(lightPos[0], lightPos[1], lightPos[2]);
+		model.appendScale(0.6, 0.6, 0.6);
+
+		lightCube.use();
+
+		// light cube
+		lightCube.render({
+			vbo: vbo,
+			modelMatrix: model,
+			viewMatrix: view,
+			projectionMatrix: proj,
+			cameraPosition: Camera.pos,
+			vertexBufferData: verticesData,
+		});
 	}
 }
