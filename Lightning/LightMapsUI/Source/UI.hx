@@ -33,7 +33,7 @@ class UI {
 
 	public function new() {
 		try {
-			new Font<FontStyleTiled>("Assets/hack_ascii.json").load(createUI);
+			new Font<FontStyleTiled>("assets/hack_ascii.json").load(createUI);
 		} catch (_) {
 			trace(haxe.CallStack.toString(haxe.CallStack.exceptionStack()), _);
 		}
