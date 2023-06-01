@@ -1,0 +1,9 @@
+-cp Source
+-lib lime
+-lib peote-text
+-lib peote-view
+-lib peote-ui
+-lib input2action
+--js bin/main.js
+-D analyzer-optimize
+-main Main
