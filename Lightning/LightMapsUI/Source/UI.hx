@@ -29,6 +29,7 @@ class UI {
 	private static var lightDiffuse:Float;
 	private static var lightSpecular:Float;
 
+	private static var materialAmbient:Float;
 	private static var materialSpecular:Float;
 
 	public function new() {
@@ -42,24 +43,19 @@ class UI {
 	public static function createUI(font:Font<FontStyleTiled>) {
 		window = Application.current.window;
 		peoteView = new PeoteView(window, false);
-		uiDisplay = new PeoteUIDisplay(30, 30, 220, 400, Color.CYAN);
+
+		uiDisplay = new PeoteUIDisplay(0, 0, window.width, window.height);
 		peoteView.addDisplay(uiDisplay);
 
+		// ------------------
+		// ----- Styles -----
+		// ------------------
+
 		var boxStyle = new BoxStyle(0x041144ff);
+		var roundBorderStyle = new RoundBorderStyle(Color.GREY2);
 
-		var roundBorderStyle = RoundBorderStyle.createById(0);
-
-		var cursorStyle = BoxStyle.createById(1, Color.RED);
-		var selectionStyle = BoxStyle.createById(2, Color.GREY3);
-
-		var fontStyleHeader = FontStyleTiled.createById(0);
-		var fontStyleInput = FontStyleTiled.createById(1);
-
-		var textInputConfig:TextConfig = {
-			backgroundStyle: boxStyle.copy(Color.GREY5),
-			selectionStyle: selectionStyle,
-			cursorStyle: cursorStyle
-		}
+		var fontStyle = new FontStyleTiled();
+		fontStyle.color = Color.GREY6;
 
 		var sliderConfig:SliderConfig = {
 			backgroundStyle: roundBorderStyle.copy(Color.GREY2),
@@ -68,179 +64,61 @@ class UI {
 			draggSpace: 1,
 		};
 
-		uiDisplay = new PeoteUIDisplay(10, 10, window.width - 20, window.height - 20, Color.GREY1, [
-			roundBorderStyle,
-			boxStyle,
-			selectionStyle,
-			fontStyleInput,
-			fontStyleHeader,
-			cursorStyle
-		]);
+		// ------------------
+		// ----- UIArea -----
+		// ------------------
 
-		peoteView.addDisplay(uiDisplay);
-
-		var area = new UIArea(50, 50, 500, 500, roundBorderStyle);
+		var area = new UIArea(50, 50, 200, 300, roundBorderStyle);
 		uiDisplay.add(area);
 
+		// this looks complicate but need if you zoom the peoteView or UIDisplay
 		area.setDragArea(Std.int(-uiDisplay.xOffset / uiDisplay.xz), Std.int(-uiDisplay.yOffset / uiDisplay.yz), Std.int(uiDisplay.width / uiDisplay.xz),
 			Std.int(uiDisplay.height / uiDisplay.yz));
 
-		var header = new UITextLine<FontStyleTiled>(0, 0, 500, 0, 1, "=== UIArea ===", null, fontStyleHeader,
+		// ---- add content to area ----
+
+		var header = new UITextLine<FontStyleTiled>(0, 0, area.width, 0, 1, "=== Header ===", font, fontStyle,
 			{backgroundStyle: roundBorderStyle, hAlign: HAlign.CENTER});
 		header.onPointerDown = (_, e:PointerEvent) -> area.startDragging(e);
 		header.onPointerUp = (_, e:PointerEvent) -> area.stopDragging(e);
 		area.add(header);
 
-		var content = new UIArea(2, header.height, area.width - 20 - 2, area.height - header.height - 20, boxStyle);
-		area.add(content);
+		// ---- Descriptions and Sliders -----
 
-		// ---- add content ----
+		var sliderHeight = 20;
+		var leftGap = 10;
+		var rightGap = 10;
+		var size = area.width - leftGap - rightGap;
+		var gapText = 20;
+		var gap = 32;
+		var yPos = 0;
 
-		var uiDisplay = new UIDisplay(20, 20, 200, 200, 1, Color.BLUE);
-		uiDisplay.onPointerOver = (_, _) -> uiDisplay.display.color = Color.RED;
-		uiDisplay.onPointerOut = (_, _) -> uiDisplay.display.color = Color.BLUE;
-		uiDisplay.onPointerDown = (_, e:PointerEvent) -> {
-			uiDisplay.setDragArea(Std.int(content.x), Std.int(content.y), Std.int(content.width + uiDisplay.width - 10),
-				Std.int(content.height + uiDisplay.height - 10));
-			uiDisplay.startDragging(e);
-		}
-		uiDisplay.onPointerUp = (_, e:PointerEvent) -> uiDisplay.stopDragging(e);
-		uiDisplay.onDrag = (_, x:Float, y:Float) -> {
-			content.updateInnerSize();
-			uiDisplay.maskByElement(content, true);
-		}
-		content.add(uiDisplay);
+		var lightAmbientText = new UITextLine<FontStyleTiled>(leftGap, yPos += gap, size, 0, 1, "lightAmbient", font, fontStyle);
+		area.add(lightAmbientText);
 
-		var uiElement = new UIElement(220, 20, 200, 200, 0, roundBorderStyle);
-		uiElement.onPointerDown = (_, e:PointerEvent) -> {
-			uiElement.setDragArea(Std.int(content.x), Std.int(content.y), Std.int(content.width + uiElement.width - 10),
-				Std.int(content.height + uiElement.height - 10));
-			uiElement.startDragging(e);
-		}
-		uiElement.onPointerUp = (_, e:PointerEvent) -> uiElement.stopDragging(e);
-		uiElement.onDrag = (_, x:Float, y:Float) -> {
-			content.updateInnerSize();
-			uiElement.maskByElement(content, true);
-		}
-		content.add(uiElement);
+		var lightAmbientSlider = new UISlider(leftGap, yPos += gapText, size, sliderHeight, sliderConfig);
+		lightAmbientSlider.onMouseWheel = (s:UISlider, e:WheelEvent) -> s.setWheelDelta(e.deltaY);
+		lightAmbientSlider.onChange = (s:UISlider, value:Float, percent:Float) -> lightAmbient = value;
+		area.add(lightAmbientSlider);
 
-		var inputPage = new UITextPage<FontStyleTiled>(250, 300, 0, 0, 1, "input\ntext by\nUIText\tPage", font, fontStyleInput, textInputConfig);
-		inputPage.onPointerDown = function(t:UITextPage<FontStyleTiled>, e:PointerEvent) {
-			t.setInputFocus(e);
-			t.startSelection(e);
-		}
-		inputPage.onPointerUp = function(t:UITextPage<FontStyleTiled>, e:PointerEvent) {
-			t.stopSelection(e);
-		}
-		inputPage.onResizeWidth = (_, width:Int, deltaWidth:Int) -> {
-			content.updateInnerSize();
-			inputPage.maskByElement(content, true); // CHECK: need here ?
-		}
-		inputPage.onResizeHeight = (_, height:Int, deltaHeight:Int) -> {
-			content.updateInnerSize();
-			inputPage.maskByElement(content, true); // CHECK: need here ?
-		}
-		content.add(inputPage);
+		var lightDiffuseText = new UITextLine<FontStyleTiled>(leftGap, yPos += gap, size, 0, 1, "lightDiffuse", font, fontStyle);
+		area.add(lightDiffuseText);
 
-		// ---------------------------------------------------------
-		// ---- Sliders to scroll the innerArea ----
-		// ---------------------------------------------------------
-
-		var hSlider = new UISlider(0, area.height - 20, area.width - 20, 20, sliderConfig);
-		hSlider.onMouseWheel = (_, e:WheelEvent) -> hSlider.setWheelDelta(e.deltaY);
-		area.add(hSlider);
-
-		var vSlider = new UISlider(area.width - 20, header.height, 20, area.height - header.height - 20, sliderConfig);
-		vSlider.onMouseWheel = (_, e:WheelEvent) -> vSlider.setWheelDelta(e.deltaY);
-		area.add(vSlider);
-
-		// bindings for sliders
-		content.bindHSlider(hSlider);
-		content.bindVSlider(vSlider);
-
-		// all here automatic after binding content to sliders
-		/*
-			// ----- initial ranges for sliders ------
-			hSlider.setRange( 0, Math.min(0, content.width - content.innerRight), content.width/content.innerRight, false, false );
-			vSlider.setRange( 0, Math.min(0, content.height - content.innerBottom), content.height/content.innerBottom , false, false);		
-
-			hSlider.onChange = (_, value:Float, percent:Float) -> {
-				content.xOffset = Std.int(value);
-				content.updateLayout();
-			}
-			vSlider.onChange = (_, value:Float, percent:Float) -> {
-				content.yOffset = Std.int(value);
-				content.updateLayout();
-			}
-
-			// ----- update Sliders if content size is changed -----
-
-			content.onResizeInnerWidth = content.onResizeWidth = (_, width:Int, deltaWidth:Int) -> {
-				hSlider.setRange( 0, Math.min(0, content.width - content.innerRight), content.width/content.innerRight, true, false );
-				//hSlider.setRange( 0, content.width - content.innerRight, content.width/content.innerRight, true, false );
-				//hSlider.setRange( content.xOffsetStart, content.xOffsetEnd, false, false );
-			}
-
-			content.onResizeInnerHeight = content.onResizeHeight = (_, height:Int, deltaHeight:Int) -> {
-				vSlider.setRange( 0, Math.min(0, content.height - content.innerBottom), content.height/content.innerBottom, true, false );
-				//vSlider.setRange( content.yOffsetStart, content.yOffsetEnd, false, false );
-			}
-
-			content.onChangeXOffset = (_, xOffset:Float, deltaXOffset:Float) -> {
-				hSlider.setValue( xOffset);
-			}
-			content.onChangeYOffset = (_, yOffset:Float, deltaYOffset:Float) -> {
-				vSlider.setValue( yOffset);
-			}				
-		 */
-
-		// ---------------------------------------------
-		// -------- button to change the size ----------
-		// ---------------------------------------------
-
-		var resizerBottomRight:UIElement = new UIElement(area.width - 19, area.height - 19, 18, 18, 2, roundBorderStyle.copy(Color.GREY3, Color.GREY1));
-
-		// resizerBottomRight.onPointerDown = (_, e:PointerEvent) -> {
-		// 	resizerBottomRight.setDragArea(Std.int(area.x + 240), Std.int(area.y + 140),
-		// 		Std.int((uiDisplay.width - uiDisplay.xOffset) / uiDisplay.xz - area.x - 240),
-		// 		Std.int((uiDisplay.height - uiDisplay.yOffset) / uiDisplay.yz - area.y - 140));
-		// 	resizerBottomRight.startDragging(e);
-		// }
-		resizerBottomRight.onPointerUp = (_, e:PointerEvent) -> resizerBottomRight.stopDragging(e);
-
-		resizerBottomRight.onDrag = (_, x:Float, y:Float) -> {
-			area.rightSize = resizerBottomRight.right + 1;
-			area.bottomSize = resizerBottomRight.bottom + 1;
-			area.updateLayout();
-		};
-		resizerBottomRight.onPointerOver = (_, _) -> window.cursor = MouseCursor.RESIZE_NWSE;
-		resizerBottomRight.onPointerOut = (_, _) -> window.cursor = MouseCursor.DEFAULT;
-
-		area.add(resizerBottomRight);
-
-		// --- arrange header and sliders if area size is changing ---
-
-		area.onResizeWidth = (_, width:Int, deltaWidth:Int) -> {
-			header.width = width;
-			vSlider.right = area.right;
-			content.rightSize = hSlider.rightSize = vSlider.left;
-		}
-
-		area.onResizeHeight = (_, height:Int, deltaHeight:Int) -> {
-			hSlider.bottom = area.bottom;
-			content.bottomSize = vSlider.bottomSize = hSlider.top;
-		}
+		var lightDiffuseSlider = new UISlider(leftGap, yPos += gapText, size, sliderHeight, sliderConfig);
+		lightDiffuseSlider.onMouseWheel = (s:UISlider, e:WheelEvent) -> s.setWheelDelta(e.deltaY);
+		lightDiffuseSlider.onChange = (s:UISlider, value:Float, percent:Float) -> lightDiffuse = value;
+		area.add(lightDiffuseSlider);
 
 		PeoteUIDisplay.registerEvents(window);
 	}
 
 	public static function getVals() {
 		return {
-			lightAmbient: 0,
-			lightDiffuse: 0,
-			lightSpecular: 0,
-			materialAmbient: 0,
-			materialSpecular: 0,
+			lightAmbient: 5,
+			lightDiffuse: 2,
+			lightSpecular: 2,
+			materialAmbient: 2,
+			materialSpecular: 2,
 		}
 	}
 }
