@@ -206,6 +206,7 @@ class Main extends Application {
 		Camera.onMouseMove(x, y);
 	}
 
+	@:access(peote.view.PeoteView)
 	public override function render(context:RenderContext):Void {
 		// don't do render unless ready
 		if (!initialized) {
@@ -243,6 +244,7 @@ class Main extends Application {
 		var lightPos = [lightX, 10.0, lightZ];
 
 		// the cube
+		// 'render' binds and activates its textures
 		cube.render({
 			vbo: vbo,
 			modelMatrix: model,
@@ -274,6 +276,10 @@ class Main extends Application {
 			diffuseMap: texture,
 		});
 
+		// cleanup
+		gl.bindBuffer(gl.ARRAY_BUFFER, null);
+		gl.useProgram(null);
+
 		model = new Matrix4();
 		model.identity();
 		model.appendTranslation(lightPos[0], lightPos[1], lightPos[2]);
@@ -291,7 +297,19 @@ class Main extends Application {
 			vertexBufferData: verticesData,
 		});
 
+		// cleanup
+		gl.bindBuffer(gl.ARRAY_BUFFER, null);
+		gl.useProgram(null);
+
 		// render ui
-		UI.peoteView.renderPart();
+		if (UI.peoteView != null) {
+			// little hack to force setting up textures all the time new
+			UI.peoteView.glStateTexture = new haxe.ds.Vector<GLTexture>(UI.peoteView.maxTextureImageUnits);
+			UI.peoteView.renderPart();
+		}
+	}
+
+	public override function onWindowResize(w:Int, h:Int) {
+		UI.peoteView.resize(w, h);
 	}
 }
