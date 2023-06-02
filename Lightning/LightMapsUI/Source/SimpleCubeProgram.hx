@@ -197,7 +197,6 @@ void main()
 		// lightning
 		_gl.uniform3f(_programLightPosUniform, params.lightPos[0], params.lightPos[1], params.lightPos[2]);
 
-		// material
 		_gl.uniform3f(_programMaterialSpecularUniform, params.material.specular[0], params.material.specular[1], params.material.specular[2]);
 		_gl.uniform1f(_programMaterialShininessUniform, params.material.shininess);
 
@@ -215,10 +214,12 @@ void main()
 		// bind tex
 		_gl.activeTexture(_gl.TEXTURE0);
 		_gl.bindTexture(_gl.TEXTURE_2D, params.diffuseMap);
+		_gl.uniform1i(_programMaterialDiffuseUniform, 0);
 
 		// bind tex
 		_gl.activeTexture(_gl.TEXTURE1);
 		_gl.bindTexture(_gl.TEXTURE_2D, params.specularMap);
+		_gl.uniform1i(_programMaterialSpecularUniform, 1);
 
 		// Set up attribute pointers
 		var stride = 8 * Float32Array.BYTES_PER_ELEMENT;
