@@ -1,4 +1,3 @@
-import lime.graphics.WebGL2RenderContext;
 import SimpleCubeProgram.Light;
 import SimpleCubeProgram.Material;
 import lime.math.Vector4;
@@ -114,7 +113,7 @@ typedef ProgramParameters = {
  */
 abstract class Program {
 	// Graphics contexts
-	var _gl:WebGL2RenderContext;
+	var _gl:WebGLRenderContext;
 
 	// GL variables
 	public var _glProgram:GLProgram;
@@ -123,7 +122,7 @@ abstract class Program {
 	 * Constructor
 	 * @param gl A WebGL render context
 	 */
-	public function new(gl:WebGL2RenderContext) {
+	public function new(gl:WebGLRenderContext) {
 		_gl = gl;
 	}
 

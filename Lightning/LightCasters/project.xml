@@ -12,6 +12,7 @@
 	<haxelib name="peote-view" />
 	<haxelib name="input2action" />
 
+
 	<haxeflag name="-dce" value="full" />
 	
 	<assets path="Assets" rename="assets" />

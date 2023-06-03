@@ -195,16 +195,22 @@ class Main extends Application {
 		var lightAmbientSlider = new UISlider(leftGap, yPos += gapText, size, sliderHeight, sliderConfig);
 		lightAmbientSlider.onMouseWheel = (s:UISlider, e:WheelEvent) -> s.setWheelDelta(e.deltaY);
 		lightAmbientSlider.onChange = (s:UISlider, value:Float, percent:Float) -> lightAmbient = value;
+		lightAmbientSlider.valueStart = 0;
+		lightAmbientSlider.valueEnd = 1;
 		area.add(lightAmbientSlider);
 
 		var lightDiffuseSlider = new UISlider(leftGap, yPos += gapText, size, sliderHeight, sliderConfig);
 		lightDiffuseSlider.onMouseWheel = (s:UISlider, e:WheelEvent) -> s.setWheelDelta(e.deltaY);
 		lightDiffuseSlider.onChange = (s:UISlider, value:Float, percent:Float) -> lightDiffuse = value;
+		lightDiffuseSlider.valueStart = 0;
+		lightDiffuseSlider.valueEnd = 1;
 		area.add(lightDiffuseSlider);
 
 		var lightSpecularSlider = new UISlider(leftGap, yPos += gapText, size, sliderHeight, sliderConfig);
 		lightSpecularSlider.onMouseWheel = (s:UISlider, e:WheelEvent) -> s.setWheelDelta(e.deltaY);
 		lightSpecularSlider.onChange = (s:UISlider, value:Float, percent:Float) -> lightSpecular = value;
+		lightSpecularSlider.valueStart = 0;
+		lightSpecularSlider.valueEnd = 1;
 		area.add(lightSpecularSlider);
 
 		PeoteUIDisplay.registerEvents(window);
@@ -287,7 +293,7 @@ class Main extends Application {
 		proj.identity();
 		MatrixUtils.createPerspective(proj, Camera.fov * Math.PI / 180, Application.current.window.width / Application.current.window.height, 0.1, 100.0);
 
-		var lightPos = [1.0, 1.0, 1.0];
+		var lightPos = [1.0, 1.0, 15.0];
 
 		for (i in 0...10) {
 			var angle = 20.0 * i;
@@ -307,12 +313,13 @@ class Main extends Application {
 				lightColor: [1.0, 1.0, 1.0],
 				viewPos: MatrixUtils.vecToArray(Camera.pos),
 				material: {
-					shininess: 64.0
+					shininess: 32.0
 				},
 				light: {
 					direction: MatrixUtils.vecToArray(Camera.pos),
 					position: MatrixUtils.vecToArray(Camera.front),
-					cutOff: Math.cos(12.5 * Math.PI / 180),
+					cutOff: Math.cos(30.5 * Math.PI / 180),
+					outerCutOff: Math.cos(32.5 * Math.PI / 180),
 					ambient: [lightAmbient, lightAmbient, lightAmbient],
 					diffuse: [lightDiffuse, lightDiffuse, lightDiffuse],
 					specular: [lightSpecular, lightSpecular, lightSpecular],

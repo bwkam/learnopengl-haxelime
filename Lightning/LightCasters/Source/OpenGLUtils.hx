@@ -2,7 +2,6 @@
  * OpenGLUtils provides a collection of GL helper functions.
  */
 
-import lime.graphics.WebGL2RenderContext;
 import lime.graphics.Image;
 import lime.graphics.WebGLRenderContext;
 import lime.graphics.WebGLRenderContext;
@@ -18,7 +17,7 @@ import lime.graphics.opengl.GLTexture;
  * @param type type of shader to compile, usually gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
  * @return GLShader
  */
-function glCreateShader(gl:WebGL2RenderContext, source:String, type:Int):GLShader {
+function glCreateShader(gl:WebGLRenderContext, source:String, type:Int):GLShader {
 	var shader = gl.createShader(type);
 	gl.shaderSource(shader, source);
 	gl.compileShader(shader);
@@ -38,7 +37,7 @@ function glCreateShader(gl:WebGL2RenderContext, source:String, type:Int):GLShade
  * @param fragmentSource fragment shader GLSL source
  * @return Null<GLProgram> the compiled and linked program or null if unsuccessful.
  */
-function glCreateProgram(gl:WebGL2RenderContext, vertexSource:String, fragmentSource:String):Null<GLProgram> {
+function glCreateProgram(gl:WebGLRenderContext, vertexSource:String, fragmentSource:String):Null<GLProgram> {
 	var vs = glCreateShader(gl, vertexSource, gl.VERTEX_SHADER);
 	var fs = glCreateShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
 
@@ -97,7 +96,7 @@ function glTextureFromImageRepeat(glctx:WebGLRenderContext, image:Image):GLTextu
 
 /**
  * Helper function to create a texture clamping to both axes.
- * @param gl the WebGL2RenderContext
+ * @param gl the WebGLRenderContext
  * @param image the Lime image to create the texture from
  * @return GLTexture
  */

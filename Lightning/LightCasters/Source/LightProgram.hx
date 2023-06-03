@@ -1,4 +1,4 @@
-import lime.graphics.WebGL2RenderContext;
+import lime.graphics.WebGLRenderContext;
 import Program.ProgramParameters;
 import lime.graphics.WebGLRenderContext;
 import lime.graphics.opengl.GLUniformLocation;
@@ -21,7 +21,7 @@ class LightProgram extends Program {
 	 * Constructor
 	 * @param gl An WebGL render context
 	 */
-	public function new(gl:WebGL2RenderContext):Void {
+	public function new(gl:WebGLRenderContext):Void {
 		var vertexSource = "#version 300 es
 
 				layout (location = 0) in vec3 aPos;
