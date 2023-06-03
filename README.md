@@ -20,7 +20,7 @@ I once stumbled across an astonishing resource for learning OpenGL, but the prob
   - [Basic Lightning](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning/PhongCube)
   - [Materials](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning/Materials)
   - [Light Maps](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning/LightMaps)
-  - - [Light Casters](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning/LightCasters)
+  - [Light Casters](https://github.com/bwkam/learnopengl-haxelime/tree/main/Lightning/LightCasters)
 
 ## Special Thanks
   - [47rooks](https://github.com/47rooks) for helping and providing structure for the code used throughout all of the demos.
