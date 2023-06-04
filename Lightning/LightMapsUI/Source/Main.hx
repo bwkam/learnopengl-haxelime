@@ -213,16 +213,16 @@ class Main extends Application {
 			return;
 		}
 
-		// ---- PEOTE-VIEW and -UI ----
+		// ---- PEOTE-VIEW and -UI (if viewport was changing or scissor-enabled by gl-picking) ----
 		gl.viewport(0, 0, window.width, window.height);
-		gl.scissor(0, 0, window.width, window.height);
-		gl.enable(gl.SCISSOR_TEST);
+		gl.disable(gl.SCISSOR_TEST);
 		// ----------------------------
 
 		// clear the screen
 		gl.clearColor(0.0, 0.0, 0.0, 0.0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
+		gl.enable(gl.DEPTH_TEST);
+		
 		cube.use();
 
 		model = new Matrix4();
@@ -301,11 +301,19 @@ class Main extends Application {
 		gl.bindBuffer(gl.ARRAY_BUFFER, null);
 		gl.useProgram(null);
 
+		
 		// render ui
-		if (UI.peoteView != null) {
-			// little hack to force setting up textures all the time new
+		if (UI.peoteView != null) 
+		{
 			UI.peoteView.glStateTexture = new haxe.ds.Vector<GLTexture>(UI.peoteView.maxTextureImageUnits);
+			
+			gl.enable(gl.SCISSOR_TEST);
+			
 			UI.peoteView.renderPart();
+			
+			UI.peoteView.setMask(0, false);
+			UI.peoteView.setGLDepth(false);
+			UI.peoteView.setGLAlpha(false);
 		}
 	}
 

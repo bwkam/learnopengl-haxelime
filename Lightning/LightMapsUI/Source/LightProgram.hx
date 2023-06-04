@@ -101,5 +101,6 @@ class LightProgram extends Program {
 
 		// draw the fucking cube
 		_gl.drawArrays(_gl.TRIANGLES, 0, 36);
+		_gl.bindBuffer(_gl.ARRAY_BUFFER, null);
 	}
 }
