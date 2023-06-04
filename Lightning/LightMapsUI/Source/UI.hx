@@ -25,12 +25,12 @@ class UI {
 	private static var uiDisplay:PeoteUIDisplay;
 	private static var window:Window;
 
-	private static var lightAmbient:Float;
-	private static var lightDiffuse:Float;
-	private static var lightSpecular:Float;
+	private static var lightAmbient:Float = 0.5;
+	private static var lightDiffuse:Float = 1.0;
+	private static var lightSpecular:Float = 2.0;
 
-	private static var materialAmbient:Float;
-	private static var materialSpecular:Float;
+	private static var materialAmbient:Float = 2.0;
+	private static var materialSpecular:Float = 2.0;
 
 	public function new() {
 		try {
@@ -97,6 +97,7 @@ class UI {
 		area.add(lightAmbientText);
 
 		var lightAmbientSlider = new UISlider(leftGap, yPos += gapText, size, sliderHeight, sliderConfig);
+		lightAmbientSlider.value = lightAmbient;
 		lightAmbientSlider.onMouseWheel = (s:UISlider, e:WheelEvent) -> s.setWheelDelta(e.deltaY);
 		lightAmbientSlider.onChange = (s:UISlider, value:Float, percent:Float) -> lightAmbient = value;
 		area.add(lightAmbientSlider);
@@ -105,6 +106,7 @@ class UI {
 		area.add(lightDiffuseText);
 
 		var lightDiffuseSlider = new UISlider(leftGap, yPos += gapText, size, sliderHeight, sliderConfig);
+		lightDiffuseSlider.value = lightDiffuse;
 		lightDiffuseSlider.onMouseWheel = (s:UISlider, e:WheelEvent) -> s.setWheelDelta(e.deltaY);
 		lightDiffuseSlider.onChange = (s:UISlider, value:Float, percent:Float) -> lightDiffuse = value;
 		area.add(lightDiffuseSlider);
@@ -114,8 +116,8 @@ class UI {
 
 	public static function getVals() {
 		return {
-			lightAmbient: 5,
-			lightDiffuse: 2,
+			lightAmbient: lightAmbient,
+			lightDiffuse: lightDiffuse,
 			lightSpecular: 2,
 			materialAmbient: 2,
 			materialSpecular: 2,

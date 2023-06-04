@@ -4,6 +4,10 @@
 	<meta title="Hello World" package="org.openfl.lime.samples.helloworld" version="1.0.0" company="OpenFL" />
 	<app main="Main" path="Export" file="HelloWorld" />
 	
+	<window width="800" height="600" fps="61" />
+	<window width="0" height="0" fps="61" if="html5||android" />
+	<window if="html5" allowHighDPI="false" />
+
 	<source path="Source" />
 	
 	<haxelib name="lime" />
@@ -14,6 +18,10 @@
 
 	<haxeflag name="-dce" value="full" />
 	
+	<haxeflag name="-dce" value="full" />
+	
+	<haxedef name="keep_inline_positions" />
+
 	<assets path="Assets" rename="assets" />
 	
 </project>

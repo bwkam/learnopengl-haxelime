@@ -208,9 +208,6 @@ void main()
 		// camera
 		_gl.uniform3f(_programViewPosUniform, params.viewPos[0], params.viewPos[1], params.viewPos[2]);
 
-		// Bind vertex buffer
-		_gl.bindBuffer(_gl.ARRAY_BUFFER, params.vbo);
-
 		// bind tex
 		_gl.activeTexture(_gl.TEXTURE0);
 		_gl.bindTexture(_gl.TEXTURE_2D, params.diffuseMap);
@@ -223,6 +220,9 @@ void main()
 
 		// Set up attribute pointers
 		var stride = 8 * Float32Array.BYTES_PER_ELEMENT;
+
+		// Bind vertex buffer
+		_gl.bindBuffer(_gl.ARRAY_BUFFER, params.vbo);
 
 		// vertices attrib pointer
 		_gl.vertexAttribPointer(_programVertexAttribute, 3, _gl.FLOAT, false, stride, 0);
